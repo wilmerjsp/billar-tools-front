@@ -1,0 +1,25 @@
+parameters:
+  - name: CF_PAGES_PROJECT_NAME
+    displayName: "Nombre del proyecto en CF"
+    type: string
+    default: 'billartools'
+
+trigger:
+  branches:
+    include:
+      - develop
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: "cloud-devops"
+      ref: refs/heads/release/v1.0.0
+
+stages:
+  - template: azure/template/FrontendCloudfareTemplate.yml@templates
+    parameters:
+      ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
+        CF_PAGES_PROJECT_NAME: 'prd-billartools'
+      ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/develop') }}:
+        CF_PAGES_PROJECT_NAME: 'billartools'
